@@ -1,0 +1,38 @@
+\documentclass[a4paper]{article}
+
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+%% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\title{Using machine learning to identify sources of glitches}
+\author{Melissa Kohl}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+The data from the Advanced LIGO detectors in Hanford, Washington and Livingston, Louisiana contain "glitches" that mimic gravitational waves and decrease each detector's sensitivity. The easiest way to identify a glitch is by looking at another detector that is in a different geographic location. However, these glitches occur so frequently that it becomes difficult to classify them by time alone. 
+
+There are two main issues involving glitches that need improvement. The first is the classification of the glitches. Due to the sheer volume of data and the frequency at which glitches occur in the data, using machine learning is an attractive way to classify the glitches. However, current machine learning techniques have difficulty creating new classifications. In typical LIGO Collaboration-style, the task of designating new classification is largely reliant on volunteers. To date, volunteers have identified two new glitch classifications. Unfortunately, human sorting is still quite inefficient, even with a large amount of people. Ideally, the machine learning algorithms could be improved to create new classifications of glitches. 
+
+Identification of the glitches themselves is only one half of the problem with glitches in the strain data. Once glitches are classified, the source must be identified so the glitches can be eliminated from future observing runs. The reduction of glitches directly leads to more sensitive strain data.
+
+Collaborators on the Advanced LIGO project use machine learning and volunteer classification to classify glitches from the most recent observing run. A fair amount of glitches have been eliminated by locating the source of the glitch. The most frequent glitch, referred to as a "blip," still has an unidentified source.
+
+\section{"Blip" Glitches}
+
+A few classifications of glitches had identifiable sources and have since been eradicated from the data. 
+
+
+\end{document}
