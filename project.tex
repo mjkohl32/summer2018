@@ -22,17 +22,43 @@
 
 \section{Introduction}
 
-The data from the Advanced LIGO detectors in Hanford, Washington and Livingston, Louisiana contain "glitches" that mimic gravitational waves and decrease each detector's sensitivity. The easiest way to identify a glitch is by looking at another detector that is in a different geographic location. However, these glitches occur so frequently that it becomes difficult to classify them by time alone. 
+In the Advanced LIGO observation runs, detection of gravitational waves has occurred for multiple black hole mergers and one neutron star collision. Although the sensitivity of the detectors is enough to detect gravitational waves from these huge astronomical events, gravitational waves are also created from other astronomical events. To detect those gravitational waves, the sensitivity of the detectors needs to be better. The strain data from both the science and observation runs of the Advanced LIGO detectors contain "glitches" that can mimic gravitational waves and obscure real gravitational waves. If these glitches were eliminated, the sensitivity of the detectors would improve, making detection of gravitational waves from astronomical events other than black hole and neutron star mergers (including smaller black hole or neutron merger events) possible. 
 
-There are two main issues involving glitches that need improvement. The first is the classification of the glitches. Due to the sheer volume of data and the frequency at which glitches occur in the data, using machine learning is an attractive way to classify the glitches. However, current machine learning techniques have difficulty creating new classifications. In typical LIGO Collaboration-style, the task of designating new classification is largely reliant on volunteers. To date, volunteers have identified two new glitch classifications. Unfortunately, human sorting is still quite inefficient, even with a large amount of people. Ideally, the machine learning algorithms could be improved to create new classifications of glitches. 
+\section{Classification of Glitches}
 
-Identification of the glitches themselves is only one half of the problem with glitches in the strain data. Once glitches are classified, the source must be identified so the glitches can be eliminated from future observing runs. The reduction of glitches directly leads to more sensitive strain data.
+To eliminate glitches, they must first be identified. The easiest way to identify a glitch is by looking at the same time frame at another detector that is in a different geographic location. Although the glitches can be eliminated from the data, they then must be classified so the source of the glitch can be identified and eliminated for future observing runs. 
 
-Collaborators on the Advanced LIGO project use machine learning and volunteer classification to classify glitches from the most recent observing run. A fair amount of glitches have been eliminated by locating the source of the glitch. The most frequent glitch, referred to as a "blip," still has an unidentified source.
+A group of scientists created a machine learning software package called GravitySpy to aid in classifying the monstrous amounts of glitches. Unlike previous machine learning techniques used on LIGO data that compared the waveforms of the glitches, GravitySpy's neural network uses spectrograms from four different time frames of each glitch to create a multi-layer network that utilizes image classification techniques. By checking four time frames of the same glitch, the network can identify glitches of different durations. 
 
-\section{Types of Glitches}
+GravitySpy is great at classifying glitches into known classifications, but has trouble identifying new classifications. The output function in GravitySpy's neural network is \textit{softmax}, which essentially just classifies the input glitch into the classification with the highest correlation, regardless of how high that correlation is. In typical LIGO Collaboration-style, the task of designating new classifications is therefore largely reliant on volunteers. To date, volunteers have identified two new glitch classifications. Although human sorting is still quite inefficient, even with a large amount of people, GravitySpy has been largely successful at the classification of glitches.
+
+\section{Identification of Sources of Glitches}
+
+Classification of the glitches themselves is only one half of the problem with glitches in the strain data. Once glitches are classified, the source must be identified so the glitches can be eliminated from future observing runs. A fair amount of glitches have been eliminated by locating the source of the glitch, but many glitches, including the most frequent glitch, referred to as a "blip," still have unidentified sources.
+
+Each LIGO detector has hundreds of channels of information keeping track of environmental and instrumental data that could contain the sources of glitches. LIGO collaborators have used machine learning to match the waveforms of the glitches in the strain data to waveforms in the individual channels, but there are too many channels for this technique to efficiently find glitch sources.
+
+
+
+
+
 
 \section{Project Ideas}
+
+\section{References}
+\begin{enumerate}
+	\item Bahaadini, Sara, et al. \textit{Deep Multi-View Models for Glitch Classification}. 2017 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 28 Apr. 2017, pp. 1?5., doi:10.1109/icassp.2017.7952693.
+	\item Mukherjee, S, et al. \textit{Classification of Glitch Waveforms in Gravitational Wave Detector Characterization}. Journal of Physics: Conference Series, vol. 243, 1 Aug. 2010, pp. 1?9., doi:10.1088/1742-6596/243/1/012006.
+	\item Rampone, Salvatore, et al. \textit{Neural Network Aided Glitch-Burst Discrimination And Glitch Classification}. International Journal of Modern Physics C, vol. 24, no. 11, 12 Sept. 2013, pp. 1-17., doi:10.1142/s0129183113500848.
+	\item Zevin, M, et al. \textit{Gravity Spy: Integrating Advanced LIGO Detector Characterization, Machine Learning, and Citizen Science}. Classical and Quantum Gravity, vol. 34, no. 6, 28 Feb. 2017, p. 064003., doi:10.1088/1361-6382/aa5cea.
+\end{enumerate}
+
+
+
+
+
+
+
 
 
 \end{document}
