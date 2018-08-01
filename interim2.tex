@@ -26,7 +26,7 @@
 
 \begin{abstract}
 
-In the Advanced LIGO observation runs, detection of gravitational waves is directly dependent on the sensitivity of the detectors. The strain data from both detectors contain continuous and transient noise that restricts the sensitivity of each detector. Transient noise, called "glitches," not only affects the general sensitivity of the detectors, but also mimics and obscures real gravitational waves in the calibrated strain data channel. The machine learning software package used to classify these glitches and identify their sources, GravitySpy\footnote{\href{https://gravity-spy.github.io}{GravitySpy documentation}}, is successful when the spectrogram of the glitch has a very distinct and unique shape. However, the spectrogram of one of the most common types of glitches, called a "blip," has an underwhelming shape with no distinct characteristics. Additionally, auxiliary channels besides the calibrated strain can pick up the glitches and supplement GravitySpy's search for sources, but blip glitches are very infrequently witnessed by other channels, making it difficult for GravitySpy to identify a source (or possibly multiple sources). The focus of this paper is to examine blip glitches in a format other than a spectrogram, such as a Q-transform, to determine if there are sub-classifications of blips that might have identifiable sources. Fortunately, the Q-transforms of a variety of blip glitches, nearly indistinguishable in a spectrogram, reveal distinct possible subclasses.
+In the Advanced LIGO observation runs, detection of gravitational waves is directly dependent on the sensitivity of the detectors. The strain data from both detectors contain continuous and transient noise that restricts the sensitivity of each detector. Transient noise, called "glitches," not only affects the general sensitivity of the detectors, but also mimics and obscures real gravitational waves in the calibrated strain data channel. The machine learning software package used to classify these glitches and identify their sources, GravitySpy\footnote{\href{https://gravity-spy.github.io}{GravitySpy documentation}}, is successful when the spectrogram of the glitch has a very distinct and unique shape. However, the spectrogram of one of the most common types of glitches, called a "blip," has an underwhelming shape with no distinct characteristics. Additionally, auxiliary channels other than the calibrated strain can pick up glitches and supplement GravitySpy's search for sources, but blip glitches are very infrequently witnessed by other channels, making it difficult for GravitySpy to identify a source (or possibly multiple sources). The focus of this paper is to examine blip glitches in a format other than a spectrogram, such as a Q-transform, to determine if there are sub-classifications of blips that might have identifiable sources, and then use Convolutional Neural Networks to sub-classify these blips. Manual searches of Q-transforms of a variety of blip glitches, nearly indistinguishable in a spectrogram, reveal six distinct possible subclasses. Additionally, the implementation of simple neural networks has provided preliminary evidence of fundamental differences between these hypothesized subclasses, confirming the assumption that there are multiple types of blips.
 
 \end{abstract} 
 
@@ -326,6 +326,7 @@ Since VAEs are so complex, it is difficult to implement convolutional layers wit
 			\caption{Decoder layers}
 			\label{fig:vae_decoder}
 		\end{subfigure}
+		\vspace{10mm}%
 		\begin{subfigure}{.8\textwidth}
 			\centering
 			\includegraphics[width=1\linewidth]{vae_mlp}
@@ -340,6 +341,7 @@ Since VAEs are so complex, it is difficult to implement convolutional layers wit
 	\label{fig:vae}
 \end{figure} 
 
+%The output of interest from the VAE is the statistical plot that can reveal clusters of data.
 
 \section{Neural Network Results} \label{results}
 
