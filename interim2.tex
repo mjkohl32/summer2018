@@ -150,7 +150,7 @@ In addition, this comparison validates GravitySpy's ability to classify similar 
 
 Before delving into possible characteristics that could separate the types of blips I had found, I wanted to clear up the spread blip's Q-transform and see whether the same variety of shapes from my findings in O1 at Livingston are present in O2 and/or at Hanford.
 
-I attempted to condense the spread blips by creating another two Q-transforms for each spread blip using the surrounding 40 seconds and 60 seconds of data, rather than my original 30 seconds, thinking that the image wasn't clear due to the signal having a longer duration compared to other blips. However, the exact same spread effect occurred for all of the known spread blips for both widened time domains. So, I went the other direction and used the surrounding 20 seconds, which would indicate a problem with the internal whitening that occurs to create the spectrogram of the transform, rather than a signal duration problem. Fortunately, this shortening of the domain cleared the images and we could see the actual shapes of the spread blips.
+I attempted to condense the spread blips by creating another two Q-transforms for each spread blip using the surrounding 40 seconds and 60 seconds of data, rather than my original 30 seconds, thinking that the image wasn't clear due to the signal having a longer duration compared to other blips. However, the exact same spread effect occurred for all of the known spread blips for both widened time domains. So, I went the other direction and used the surrounding 20 seconds, which could indicate a problem with the internal whitening that occurs to create the spectrogram of the transform, rather than a signal duration problem. Fortunately, this shortening of the domain cleared the images and we could see the actual shapes of the spread blips, one example of which is in figure \ref{fig:spread_ex} on page \pageref{fig:spread_ex}.
 
 \begin{figure}[h!]
 	\centering
@@ -170,7 +170,7 @@ I attempted to condense the spread blips by creating another two Q-transforms fo
 	\label{fig:spread_ex}
 \end{figure}
 
-Almost immediately, it was clear that there was nothing special about the spread blips; the original time domain parameter of the Q-transform was simply obscuring the image. Some of the spreads turned out to be dot blips, others normals and sticks. However, a couple spreads contained two apparent signals within 100 milliseconds of each other, an example of which is in figure \ref{fig:spread_ex} on page \pageref{fig:spread_ex}. 
+If not for the suspiciously large Q-value in figure \ref{fig:spread_30}, it would appear that the original time domain parameter of the Q-transform was simply obscuring the image. Some of the spreads condensed down to dot blips, others normals and sticks. A couple spreads even contained two apparent signals within 100 milliseconds of each other, such as figure \ref{fig:spread_20}, which I call a double-blip. Although changing the amount of data to get rid of spreading in my Q-transforms is good enough for the purposes of this project, the reason behind this spreading is unknown and could be a future point of investigation.
 
 Now knowing that 20 seconds is a more consistent parameter for the Q-transform than 30 seconds, and also knowing that there was a large possibility for other types of blips beyond dots, normals, and sticks, I plotted and classified around 150 blip glitches from Hanford O2 and about 100 blip glitches from Livingston O2. The six major shapes of blips, all of which are at both detectors, are in figure \ref{fig:six} on page \pageref{fig:six}. The dot, stick, and normal are still there, but I also found double-blips, snitches (named for the Golden Snitch from \textit{Harry Potter}), and hats (named for the Sorting Hat from \textit{Harry Potter}). 
 
@@ -320,16 +320,22 @@ Since VAEs are so complex, it is difficult to implement convolutional layers wit
 	\end{subfigure}
 	\begin{subfigure}{.49\textwidth}
 		\centering
-		\includegraphics[width=1\linewidth]{vae_mlp_decoder}
-		\caption{Decoder layers}
+		\begin{subfigure}{.6\textwidth}
+			\centering
+			\includegraphics[width=1\linewidth]{vae_mlp_decoder}
+			\caption{Decoder layers}
+			\label{fig:vae_decoder}
+		\end{subfigure}
+		\begin{subfigure}{.8\textwidth}
+			\centering
+			\includegraphics[width=1\linewidth]{vae_mlp}
+			\caption{Combined model summary}
+			\label{fig:vae_mlp}
+		\end{subfigure}
+		%\caption{Decoder layers}
 		\label{fig:decoder}
 	\end{subfigure}
-	\begin{subfigure}{.49\textwidth}
-		\centering
-		\includegraphics[width=1\linewidth]{vae_mlp}
-		\caption{Combined model summary}
-		\label{fig:vae_mlp}
-	\end{subfigure}
+	
 	\caption{Layers of a Variational Autoencoder.}
 	\label{fig:vae}
 \end{figure} 
