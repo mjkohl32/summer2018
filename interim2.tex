@@ -291,23 +291,51 @@ The last thing to do before creating the neural networks themselves is to create
 
 The goal of a supervised learning neural network is to see whether specific attributes of blips create clusters. We can label specific blips based on their omicron trigger values, and then evaluate the correlation based on the accuracy of the trained neural network. For example, I can label all the 200 Hz blips from Livingston with a "1," and label all the 200 Hz blips from Hanford with a "0," and see if the neural network can distinguish one "class" from another. If the Hanford 200 Hz blips are fundamentally different than the ones at Livingston, the neural network should have a high accuracy.
 
-The example above is a case of binary classification, but we can create a neural network with as many classes as we want. Additionally, most neural networks have one input, but we can also create a two-input neural network that takes in both images and auxiliary data from the omicron trigger. As a result, I created four modifiable neural networks: one-input binary, two-input binary, one-input multi-class, and two-input multi-class. All four have almost exactly the same network of layers, but since they all have different uses, it is easy to implement different ideas. A condensed version of the layers in both of the two-input neural networks is in figure \ref{fig:sup_condensed}. The only difference between the 
+The example above is a case of binary classification, but we can create a neural network with as many classes as we want. Additionally, most neural networks have one input, but we can also create a two-input neural network that takes in both images and auxiliary data from the omicron trigger. As a result, I created four neural networks templates: one-input binary, two-input binary, one-input multi-class, and two-input multi-class. All four have almost exactly the same network of layers, but since they all have different uses, it is easy to implement different ideas. A condensed version of the layers in both of the two-input neural networks is in figure \ref{fig:sup_condensed}. The only difference between the two-input CNN and the one-input CNN is that the Flatten layer goes straight to the first Dense layer. To make this network multi-class instead of binary, the end output shape of the last layer is changed from 1 to the number of classes, and the loss function is changed from $binary_crossentropy$ to $categorical_crossentropy$.
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=.5\linewidth]{sup_condensed}
-	\caption{Condensed version of two-input Convolutional NN.}
+	\caption{Condensed version of my two-input Convolutional NN. There are additional Conv2D and MaxPooling2D layers between the Input layer and the Flatten layer, and an additional Dense and Dropout layer before the main output layer.}
 	\label{fig:sup_condensed}
 \end{figure}
 
+The auxiliary input consists of about 6-12 omicron data values, including but not limited to q-value, confidence, SNR, bandwidth, duration, interferometer, and image status. The shape of the auxiliary input varies depending on what "classes" the neural network is looking at. Going back to the earlier example about distinguishing Livingston 200 Hz blips from Hanford 200 Hz blips, that auxiliary input would not include the interferometer or the peak frequency of each blip. 
 
+Although adding auxiliary input seems helpful because it gives the neural networks more information, the performance difference between one-input neural networks and two-input neural networks is non-existent. Using images by themselves is exactly the same as using images along with auxiliary data. This is consistent with GravitySpy, which is directly dependent on images. The auxiliary data is not robust enough to aid in classification, both in GravitySpy's glitch classification and this project's sub-classification of blips. As a result, I mostly used the one-input neural networks. A summary of the different neural networks that I ran and their conclusions and implications is in section \ref{results}.
 
 \subsection{Unsupervised Neural Network}
 
 For my unsupervised neural network, I modified public source code\footnote{\href{https://github.com/keras-team/keras/blob/master/examples/variational_autoencoder.py}{GitHub source code}} to make a Variational Autoencoder (VAE). This type of unsupervised neural network consists of an encoder and a decoder, where Bayesian statistic techniques are used between the encoder and decoder to better predict what the data should look like . Unlike supervised learning, which outputs a value corresponding to a class, autoencoders output new images. The new images then get put through the encoder part of the neural network, which also outputs meaningful statistical values. We can then create a scatter plot of the statistical values from all the images and see if there are visible clusters\cite{Kingma:2013}. 
 
-Since VAEs are so complex, it is difficult to implement convolutional layers within the autoencoder, especially when the input data is so large. However, I managed to sneak in a few layers into the encoder without overloading memory. The layers of the VAE neural network are in figure TBD. 
+Since VAEs are so complex, it is difficult to implement convolutional layers within the autoencoder, especially when the input data is so large. However, I managed to sneak in a few layers into the encoder without overloading memory. The layers of the VAE neural network are in figure \ref{fig:vae}.
 
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{vae_mlp_encoder}
+		\caption{Convolutional encoder layers}
+		\label{fig:encoder}
+	\end{subfigure}
+	\begin{subfigure}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{vae_mlp_decoder}
+		\caption{Decoder layers}
+		\label{fig:decoder}
+	\end{subfigure}
+	\begin{subfigure}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{vae_mlp}
+		\caption{Combined model summary}
+		\label{fig:vae_mlp}
+	\end{subfigure}
+	\caption{Layers of a Variational Autoencoder.}
+	\label{fig:vae}
+\end{figure} 
+
+
+\section{Neural Network Results} \label{results}
 
 
 \bibliography{references}
