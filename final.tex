@@ -352,12 +352,13 @@ As mentioned in the previous section, I first started with both one-input and tw
  \rowcolor{pink}
   & One-input & Binary & (521,57) & 0.6640 & 0.0877 \\
   \rowcolor{pink}
- \multirow{-2}{*}{\hfil \hyperlink{sup3}{4}}& Two-input & Binary & (521,57) & 0.6643 & 0.0702 \\
+ \multirow{-2}{*}{\hfil \hyperlink{binary}{4}}& Two-input & Binary & (521,57) & 0.6643 & 0.0702 \\
  5 & One-input & Binary & (1196,132) & 0.6956 & 0.1288 \\
  6 & One-input & Binary & (369,41) & 0.6255 & 0.7317 \\
  7 & One-input & Binary & (938,104) & 0.6935 & 0.4808 \\
  \rowcolor{pink}
- 8 & One-input & Multi & (1089,181) & 1.4652 & 0.3923 \\
+ \hyperlink{multi}{8} & One-input & Multi & (1089,181) & 1.4652 & 0.3923 \\
+ 9 & One-input & Multi & (1472,245) & 1.2798 & 0.3224 \\
  \hline
 \end{tabular}
 \caption{Summary of supervised networks used. Networks that can give the most useful information have large datasets, low end loss, and test accuracy close to 0 or 1. Note that comparing the loss between binary and multi-class networks is insignificant because of the different loss functions. The most important column is the test accuracy, which is the percentage of test data that was correctly predicted by the trained neural network. A test accuracy close to 1 corresponds to a strong difference between the classes, and a test accuracy close to 0 means the classes are essentially impossible to distinguish from each other. }
@@ -385,7 +386,7 @@ Although each network is comprised of the same set of layers, as explained in th
 		\item Class 1: SNR between 15-30
 	\end{itemize} Due to the large, clear hole within the 200 Hz Hanford column in Figure \ref{fig:lho_2d}, the assumption going in was that this network would have a very high test accuracy. Unfortunately, both the one-input and two-input networks were about 35\% accurate, which gives an inconclusive result despite such a large input dataset.
 	
-	\item \hypertarget{sup3}{Left-most bin} in Figures \ref{fig:llo_2d} and \ref{fig:lho_2d}.
+	\item \hypertarget{binary}{Left-most bin} in Figures \ref{fig:llo_2d} and \ref{fig:lho_2d}.
 	\begin{itemize}
 		\item Class 0: Livingston blips with peak frequency between 40-50 Hz
 		\item Class 1: Hanford blips with peak frequency between 80-100 Hz
@@ -407,13 +408,25 @@ Although each network is comprised of the same set of layers, as explained in th
 	\begin{itemize}
 		\item Class 0: Hanford blips
 		\item Class 1: Livingston blips
-	\end{itemize} The test accuracy for this network is the closest to 50\% out of all the supervised networks, suggesting that these two groupings are 
+	\end{itemize} The test accuracy for this network is the closest to 50\% out of all the supervised networks, suggesting that these two groupings are similar, and possibly only include a single shape. After examining some images in each grouping, it seems my assumptions about a binary supervised network with a test accuracy around 50\% are correct; almost all the images in both groupings are normals with a fairly high frequency. 
+	
+	\item \hypertarget{multi}{Self-labeled blips} from both Hanford and Livingston with no specific parameters
+	\begin{itemize}
+		\item 6 Classes: Dots, Hats, Normals, Snitches, Sticks, Doubles
+	\end{itemize} Although I managed to create a reasonably-sized dataset of subclass-labeled blips, multi-classification is difficult to even get to 50\% accuracy. If two of the classes are difficult to distinguish between, such as possibly hats and normals, the same result as in network \hyperlink{binary}{4} occurs for those classes, bringing down the overall effectiveness of the training of the neural network. As such, this specific network performs better than any other multi-class network that I created, which all attempt to make classification of a subset of the sub-classes easier by eliminating other sub-classes. The next neural network is an example of this.
+	
+	\item Self-labeled blips from both Hanford and Livingston with no specific parameters
+	\begin{itemize}
+		\item 4 Classes: Dots, Hats, Normals, Sticks
+	\end{itemize} Eliminating the doubles and snitches, which occur infrequently and can have unreliable shapes, yields a slightly lower test accuracy and lower end loss. Although the end loss is better than in network \hyperlink{multi}{8}, the lower test accuracy suggests that having all six classes is advantageous for training.
 	
 \end{enumerate}
 
+The results from the supervised neural networks are, at best, mildly conclusive, with most attempts at isolating sub-classes falling completely short and little information gained from the start of running these neural networks to the end. As demonstrated by the failure of secondary auxiliary input to improve these networks, the different types of blips cannot be distinguished from each other by creating groupings based on the same auxiliary data. It is therefore not especially surprising that we must move to unsupervised learning to better find blip sub-classifications.
+
 \subsection{Unsupervised Neural Network}
 
-For my unsupervised neural network, I modified public source code\footnote{\href{https://github.com/keras-team/keras/blob/master/examples/variational_autoencoder.py}{GitHub source code}} to make a Variational Autoencoder (VAE). This type of unsupervised neural network consists of an encoder and a decoder, where Bayesian statistic techniques are used between the encoder and decoder to better predict what the data should look like. Unlike supervised learning, which outputs a value corresponding to a class, autoencoders output new images. The neural network trains itself by trying to create as close to the same image as what was put in. Once the neural network is trained, the test images then get put through the encoder part of the neural network, which also outputs meaningful statistical values. We can then create a scatter plot of the statistical values from the test images and see if there are visible clusters \cite{Kingma:2013}. 
+For my unsupervised neural network, I modified public source code\footnote{\href{https://github.com/keras-team/keras/blob/master/examples/variational_autoencoder.py}{GitHub source code}} to make a Variational Autoencoder (VAE). This type of unsupervised learning consists of an encoder and a decoder, where Bayesian statistic techniques are used between the encoder and decoder to find similarities between different inputs. These statistical values should have similar values when the inputs are similar, creating the possibility of clustering. Unlike supervised learning, which outputs a value corresponding to a class, autoencoders output new images. The neural network trains itself by trying to create as close to the same image as what was put in. Once the neural network is trained, the test images then get put through the encoder part of the neural network, which outputs the meaningful statistical values. We can then create a scatter plot of the statistical values from the test images and see if there are visible clusters \cite{Kingma:2013}. 
 
 Since VAEs are so complex, it is difficult to implement convolutional layers within the autoencoder, especially when the input data is so large. However, I managed to sneak in a few layers into the encoder without overloading memory. The layers of the VAE neural network are in Figure \ref{fig:vae}.
 
@@ -440,25 +453,105 @@ Since VAEs are so complex, it is difficult to implement convolutional layers wit
 			\caption{Combined model summary}
 			\label{fig:vae_mlp}
 		\end{subfigure}
-		%\caption{Decoder layers}
 		\label{fig:decoder}
 	\end{subfigure}
 	
-	\caption{Layers of a Variational Autoencoder.}
+	\caption{Layers of a Variational Autoencoder (VAE). The statistical values are at the end of the encoder in \ref{fig:encoder}, where the layers split into \texttt{z\_mean} and \texttt{z\_log\_var}. Additionally, the output \texttt{Dense()} layer in the decoder in \ref{fig:vae_decoder} has the same size as the \texttt{InputLayer()} in \ref{fig:encoder}, clearly demonstrating the difference between a VAE and a supervised network, which outputs a class number rather than a decoded image.}
 	\label{fig:vae}
 \end{figure} 
 
-The output of interest from the VAE is the statistical plot that can reveal clusters of data. The VAE can be run both without any assumed classes and with labels that we think correspond to clusters. Finding clusters is especially important for future sub-classification because the success of sub-classification could depend on how easily the blips cluster during unsupervised learning. If no clusters are found, it is likely to be extremely difficult for a neural network to distinguish between the different types of blips, no matter how easy it is for us to see the differences by eye. The next section goes through the clustering found by my VAE.
+The output of interest from the VAE is the statistical plot that can reveal clusters of data. Since training an unsupervised network does not depend on labels, the VAE can be run both without any assumed classes and with labels that we think correspond to clusters. Finding clusters is especially important for future sub-classification because the success of sub-classification depends on how easily the blips cluster during unsupervised learning. If no clusters are found, it is likely to be extremely difficult for a neural network to distinguish between the different types of blips, no matter how easy it is for us to see the differences by eye. The next section goes through the clustering found by my VAE.
 
 \subsubsection{Results of Unsupervised Network}
 
-The first 
+The first run of the VAE used no labels and included all the blips from both detectors during O2. Unsurprisingly, there are so many dots on the scatter plot that the graph is essentially a huge blob. However, labeling each blip with its interferometer distinguishes the blips slightly more, as seen in Figure \ref{fig:unlabeled}. Interestingly, there does appear to be a group offset from the rest in both plots.
+
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{vae_unlabeled}
+		\caption{All blips from Hanford and Livingston}
+		\label{fig:vae_unlabeled}
+	\end{subfigure}
+	\begin{subfigure}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{vae_ifo_unlabeled}
+		\caption{Blips labeled by interferometer}
+		\label{fig:vae_ifo_unlabeled}
+	\end{subfigure}
+	\caption{Initial VAE scatter plots of all blips.}
+	\label{fig:unlabeled}
+\end{figure}
+
+Blah blah blah something about the top plots blah blah blah something about the lower plots
+
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}{.8\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{vae_llo_freq_labeled}
+		\caption{Livingston blips labeled by their bin in Figure \ref{fig:llo_centr}.}
+		\label{fig:llo_freq_labeled}
+	\end{subfigure}
+	\begin{subfigure}{.8\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{vae_lho_freq_labeled}
+		\caption{Hanford blips labeled by their bin in Figure \ref{fig:lho_centr}.}
+		\label{fig:lho_freq_labeled}
+	\end{subfigure}
+	\caption{Blips labeled by frequency bins.}
+	\label{fig:freq_labeled}
+\end{figure}
+
+Blah blah blah something about the frequency plots blah blah blah something about the subclass plots
+
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}{.8\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{vae_llo_labeled}
+		\caption{Livingston blips labeled by subclass.}
+		\label{fig:llo_labeled}
+	\end{subfigure}
+	\begin{subfigure}{.8\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{vae_lho_labeled}
+		\caption{Hanford blips labeled by subclass.}
+		\label{fig:lho_labeled}
+	\end{subfigure}
+	\caption{Blips labeled by subclass.}
+	\label{fig:vae_labeled}
+\end{figure}
+
+Blah blah blah something about the suclasses slash the sticks and such blah blah blah something about conclusions and such blah blah blah
 
 
 \bibliography{references}
 \bibliographystyle{ieeetr}
 
 \end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
