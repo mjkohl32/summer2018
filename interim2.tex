@@ -4,6 +4,7 @@
 \usepackage[english]{babel}
 \usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage[table]{xcolor}
 
 %% Sets page size and margins
 \usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
@@ -14,6 +15,9 @@
 \usepackage{subcaption}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\usepackage{multirow}
+
 
 %\title{Investigating Blip Glitches Using GravitySpy and Q-Transforms to Find Sub-Classes}
 \title{Sub-Classification of Blip Glitches Using Q-Transforms and Convolutional Neural Networks with GravitySpy}
@@ -218,7 +222,7 @@ Now knowing that 20 seconds is a more consistent parameter for the Q-transform t
 
 The variance in the background of each image is due to the relative energy of each blip. In this figure, the dot blip (figure \ref{fig:dot_O2}) has a relatively low energy compared to the normal blip (figure \ref{fig:normal_O2}), which is why the normal blip is so clear. However, I also found high energy dots and low energy normals in my image database. The double-blip, on the other hand, appears to always have relatively low energy, and it always has one low-frequency dot shape around 100 ms away from the mid-frequency, lower duration signal that causes the omicron trigger. It is unclear whether this is simply a coincidence, where two blips just so happen to be practically on top of each other, or if these are two connected signals in a cause-effect relationship, or if the low-frequency dot is simply a side effect of the whitening of the Q-transform.
 
-The hat blip, similar to the double-blip, is a complete mystery. The name comes from the wavy, squiggly nature of its shape, which is very different from the symmetry present in all the other types of blips (other than double-blips). The hat in figure \ref{fig:hat_O2} is particularly interesting and unique due to the hole underneath the brightest part of the signal, but all hats follow the general shape of a wavy top and a more spread-out, wavy bottom. One consistency among hat blips is their general frequency range, which is low- to mid-frequency.
+The hat blip, similar to the double-blip, is a complete mystery. The name comes from the wavy, squiggly nature of its shape, which is very different from the symmetry present in all the other types of blips (other than double-blips). The base of the hat in figure \ref{fig:hat_O2} is at a fairly low frequency, but the bases of other hats are a slightly higher frequency, and all hats follow the general shape of a wavy top and a more spread-out, wavy bottom. One consistency among hat blips is their general frequency range, which is low- to mid-frequency.
 
 The last new blip is the snitch, which has two vertical, upward trails on either side of a round ball. Similar to other blip types, the snitch occurs at both high and low frequency. 
 
@@ -330,11 +334,41 @@ Although adding auxiliary input seems helpful because it gives the neural networ
 
 \subsubsection{Results of Supervised Network}
 
-As mentioned in the previous section, I first started with both one-input and two-input neural networks. Results to come.
+As mentioned in the previous section, I first started with both one-input and two-input neural networks. Results in table \ref{table:1}.
+
+%black, blue, brown, cyan, darkgray, gray, green, lightgray, lime, magenta, olive, orange, pink, purple, red, teal, violet, white, yellow
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{||c c c c c c||} 
+ \hline
+ NN & Input & Classes & (Training, Testing) & End Loss & Test Accuracy \\ [0.5ex] 
+ \hline\hline
+ \multirow{2}{*}{\hfil 1} & One-input & Binary & (573,63) & 0.5310 & 0.8571 \\ 
+  & Two-input & Binary & (573,63) & 0.5288 & 0.8571 \\ 
+  \multirow{2}{*}{\hfil 2} & One-input & Binary & (1178,130) & 0.6792 & 0.3540 \\ 
+  & Two-input & Binary & (1178,130) & 0.6824 & 0.3540 \\
+ \rowcolor{pink}
+  & One-input & Binary & (521,57) & 0.6643 & 0.0702 \\
+  \rowcolor{pink}
+ \multirow{-2}{*}{\hfil 3}& Two-input & Binary & (521,57) & 0.6640 & 0.0877 \\
+ 4 & One-input & Binary & (1196,132) & 0.6956 & 0.1288 \\
+ 5 & One-input & Binary & (1717,190) & 0.6099 & 0.3271 \\
+ 6 & One-input & Binary & (369,41) & 0.6255 & 0.7317 \\
+ 7 & One-input & Binary & (509,56) & 0.6215 & 0.6786 \\
+ 8 & One-input & Binary & (455,50) & 0.6831 & 0.5601 \\
+ 9 & One-input & Binary & (938,104) & 0.6935 & 0.4808 \\
+ \rowcolor{pink}
+ 10 & One-input & Multi & (1089,181) & 1.4652 & 0.3923 \\
+ \hline
+\end{tabular}
+\caption{Table to test captions and labels}
+\label{table:1}
+\end{table}
 
 \subsection{Unsupervised Neural Network}
 
-For my unsupervised neural network, I modified public source code\footnote{\href{https://github.com/keras-team/keras/blob/master/examples/variational_autoencoder.py}{GitHub source code}} to make a Variational Autoencoder (VAE). This type of unsupervised neural network consists of an encoder and a decoder, where Bayesian statistic techniques are used between the encoder and decoder to better predict what the data should look like. Unlike supervised learning, which outputs a value corresponding to a class, autoencoders output new images. The new images then get put through the encoder part of the neural network, which also outputs meaningful statistical values. We can then create a scatter plot of the statistical values from all the images and see if there are visible clusters \cite{Kingma:2013}. 
+For my unsupervised neural network, I modified public source code\footnote{\href{https://github.com/keras-team/keras/blob/master/examples/variational_autoencoder.py}{GitHub source code}} to make a Variational Autoencoder (VAE). This type of unsupervised neural network consists of an encoder and a decoder, where Bayesian statistic techniques are used between the encoder and decoder to better predict what the data should look like. Unlike supervised learning, which outputs a value corresponding to a class, autoencoders output new images. The neural network trains itself by trying to create as close to the same image as what was put in. Once the neural network is trained, the test images then get put through the encoder part of the neural network, which also outputs meaningful statistical values. We can then create a scatter plot of the statistical values from the test images and see if there are visible clusters \cite{Kingma:2013}. 
 
 Since VAEs are so complex, it is difficult to implement convolutional layers within the autoencoder, especially when the input data is so large. However, I managed to sneak in a few layers into the encoder without overloading memory. The layers of the VAE neural network are in figure \ref{fig:vae}.
 
@@ -369,7 +403,11 @@ Since VAEs are so complex, it is difficult to implement convolutional layers wit
 	\label{fig:vae}
 \end{figure} 
 
-The output of interest from the VAE is the statistical plot that can reveal clusters of data. The VAE can be run both without any assumed classes and with labels that we think correspond to clusters. Once I have results from the VAE, they will be posted here.
+The output of interest from the VAE is the statistical plot that can reveal clusters of data. The VAE can be run both without any assumed classes and with labels that we think correspond to clusters. Finding clusters is especially important for future sub-classification because the success of sub-classification could depend on how easily the blips cluster during unsupervised learning. If no clusters are found, it is likely to be extremely difficult for a neural network to distinguish between the different types of blips, no matter how easy it is for us to see the differences by eye. The next section goes through the clustering found by my VAE.
+
+\subsubsection{Results of Unsupervised Network}
+
+The first 
 
 
 \bibliography{references}
