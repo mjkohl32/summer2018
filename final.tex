@@ -98,7 +98,7 @@ After discovering these differing forms in the Q-transforms, and plotting about 
 	\end{subfigure}
 	\begin{subfigure}[t]{.29\textwidth}
 		\centering
-		\includegraphics[width=1.1\linewidth]{normal_blip}
+		\includegraphics[width=1.1\linewidth]{normal_blip2}
 		\caption{Normal blip Q-transform}
 		\label{fig:normal_q}
 	\end{subfigure}
@@ -110,7 +110,7 @@ After discovering these differing forms in the Q-transforms, and plotting about 
 	\end{subfigure}
 	\begin{subfigure}[t]{.29\textwidth}
 		\centering
-		\includegraphics[width=1.1\linewidth]{spread_blip}
+		\includegraphics[width=1.1\linewidth]{spread_blip2}
 		\caption{Spread blip Q-transform}
 		\label{fig:spread_q}
 	\end{subfigure}
@@ -122,7 +122,7 @@ After discovering these differing forms in the Q-transforms, and plotting about 
 	\end{subfigure}
 	\begin{subfigure}[t]{.29\textwidth}
 		\centering
-		\includegraphics[width=1.1\linewidth]{dot_blip}
+		\includegraphics[width=1.1\linewidth]{dot_blip2}
 		\caption{Dot blip Q-transform}
 		\label{fig:dot_q}
 	\end{subfigure}
@@ -134,7 +134,7 @@ After discovering these differing forms in the Q-transforms, and plotting about 
 	\end{subfigure}
 	\begin{subfigure}[t]{.29\textwidth}
 		\centering
-		\includegraphics[width=1.1\linewidth]{stick_blip}
+		\includegraphics[width=1.1\linewidth]{stick_blip2}
 		\caption{Stick blip Q-transform}
 		\label{fig:stick_q}
 	\end{subfigure}
@@ -244,7 +244,7 @@ Now that I had a fairly robust idea of the possible subclassifications of blips,
 		\caption{Livingston blips}
 		\label{fig:llo_peakf}
 	\end{subfigure}
-	\caption{}
+	\caption{Peak frequency histograms for blips during O2.}
 	\label{fig:combined_peakf}
 \end{figure}
 
@@ -288,7 +288,7 @@ One data point that hasn't been mentioned so far is central frequency. Although 
 		\caption{Hanford 2D histogram}
 		\label{fig:lho_centr}
 	\end{subfigure}
-	\caption{Central frequency versus peak frequency 2D histograms of blips from O2.}
+	\caption{Peak frequency versus central frequency 2D histograms of blips from O2.}
 	\label{fig:central_hists}
 \end{figure}
 
@@ -298,15 +298,15 @@ All the 2D histograms have high density bins, and we can use neural networks to 
 
 \section{Neural Network Implementation}
 
-At this point in the project, Neural Networks become more desirable than histograms and manual searching. We want to know if the six types of blips can be identified by a computer, not just one person looking at a couple hundred images. If a Neural Network can be used to find the differences between the types of blips, then we know that sub-classification is possible and can be implemented in GravitySpy to classify all blips and find their sources.
+At this point in the project, Neural Networks become more desirable than histograms and manual searching. We want to know if the six types of blips can be identified by a computer, not just one person looking at a couple hundred images. If a Neural Network can be used to find the differences between the types of blips, then we know that sub-classification is possible and can be implemented in GravitySpy to classify all blips, bringing us a huge step forward in finding a source. I implemented the Neural Networks through Keras\footnote{\href{https://keras.io}{Keras documentation}}, using a TensorFlow\footnote{\href{https://www.tensorflow.org}{TensorFlow website}} backend.
 
-\subsection{Building a Neural Network}
+\subsection{Building a Neural Network} \label{section:build_nn}
 
-There are countless ways to build and implement a Neural Network. The first step is deciding what type of learning we want: supervised learning, reinforcement learning, or unsupervised learning. Reinforcement learning can almost immediately be discarded. Since it depends on a function to reward the program, it is not very helpful for image classification, which cannot be easily translated into better states versus worse states. The ideal technique is unsupervised learning because we have a guess as to the number of classes and we don't have a large dataset of images that are already classified into those classes. However, unsupervised learning is extremely complex and only effective when there are clear subclasses to be found. Supervised learning, on the other hand, is a more accurate method because the neural network is trying to classify already-labeled data and therefore has a much better gauge of accuracy. Unfortunately, since we are trying to identify the classes themselves, this learning technique is also not ideal for our purposes, especially because I only have about 250 sub-classified blips that can serve as a labeled dataset. As a result, I implemented both supervised and unsupervised learning neural networks.
+There are countless ways to build and implement a Neural Network. The first step is deciding what type of learning we want: supervised learning, reinforcement learning, or unsupervised learning. Reinforcement learning can almost immediately be discarded because it depends on a function to reward the program. Images cannot be easily translated into a function, so reinforcement learning is off the table. Supervised learning, on the other hand, is easy to implement and has a clear method for knowing whether the neural network is doing well or not. Unfortunately, supervised learning requires a large dataset of pre-labeled inputs, which we do not have. The ideal technique is therefore unsupervised learning, which doesn't need pre-set labels and trains using any metric that we want. However, unsupervised learning is extremely complex and the success of an unsupervised network is difficult to gauge. I ended up implementing both supervised and unsupervised learning neural networks--sections \ref{section:sup} and \ref{section:unsup} explain the types of networks and the reasons for using them in more depth.
 
-The next step in creating a neural network is deciding the type of layers to put in the network. Since I want my input set to consist of images, I used Convolutional Neural Networks (CNNs) in both the supervised and unsupervised models. CNNs are better for images than a normal dense layer because they take all the surrounding points into consideration. Each image is stored as a multi-dimensional array, but normal dense layers can only interpret a single array, and can therefore only take into account pixels that are horizontally next to each other. CNNs, on the other hand, take in multi-dimensional arrays as input and use all the surrounding pixels to learn about the image. 
+The next step in creating a neural network is deciding the type of layers to put in the network. Since I want my input set to consist of images, I used Convolutional Neural Networks (CNNs) in both the supervised and unsupervised models. CNNs are better for images than a normal dense layer because they take all the surrounding points into consideration. Each image is stored as a multi-dimensional array, but normal dense layers can only interpret a single array, and can therefore only see pixels that are horizontally next to each other. CNNs take in multi-dimensional arrays as input and use all the surrounding pixels to learn about the image. A more technical explanation is that CNNs are actually CNN layers paired with pooling and up-sampling layers to manipulate the images in different ways. The CNN reshapes the image, meaning that a 50x100 array (pixel image) gets converted to a 25x200 array. Pooling layers look at groups of pixels to create a smaller image. For example, imagine a square spilt into four colored squares, each colored square representing a pixel. The pooling layer will look at the four squares, find the average color, and create a new image with only one pixel where the four pixels used to be. Pooling down-converts an image, for example turning a 50x100 image into a 25x50 image. Upsampling layers are the opposite of pooling, this time extrapolating four pixels from one starting pixel. All three types of layers have weights associated with them, so each time through training, the effect of each layer changes slightly. The combination of these three types of layers create a Convolutional Neural Network.
 
-The last thing to do before creating the neural networks themselves is to create the input dataset, i.e. the images. I created a database of all the blips from Hanford and Livingston during O2, by plotting Q-transforms with a standardized time domain (20 seconds), cropped down to 0.22 seconds, similar to the previous images I created. I left the energy (colorbar) to scale itself during the calculation, mostly because the disparity between blips with low energy and blips with high energy is so drastic that the shapes become difficult to distinguish with a standardized energy scale. An example of the images in the database is in Figure \ref{fig:image}. Since there are no axes or titles, the images are labeled with their GPS time and detector from their file names. This also allows access to the images of specific blips during future searches, which is helpful for supervised learning.
+The last thing to do before creating the neural networks themselves is to create the input dataset, in this case the images. I created a database of Q-transform spectrograms of all the blips from Hanford and Livingston during O2. each image used a standardized amount of data (20 seconds) and was cropped down to a time domain of 0.22 seconds, which is a slightly smaller than previous images I had created. I left the energy colorbar to scale itself during the calculation, mostly because the disparity between blips with low energy and blips with high energy is so drastic that the shapes become difficult to distinguish with a standardized energy scale. An example of the images in the database is in Figure \ref{fig:image}. Since there are no axes or titles, the images are labeled with their GPS time and detector from their file names. This file labeling allows access to the images of specific blips, which is helpful for both supervised and unsupervised learning.
 
 \begin{figure}[h!]
 	\centering
@@ -315,11 +315,11 @@ The last thing to do before creating the neural networks themselves is to create
 	\label{fig:image}
 \end{figure}
 
-\subsection{Supervised Learning Neural Network}
+\subsection{Supervised Learning Neural Network} \label{section:sup}
 
-The goal of a supervised learning neural network is to see whether specific attributes of blips create clusters. We can label specific blips based on their omicron trigger values, and then evaluate the correlation based on the accuracy of the trained neural network. For example, I can label all the 200 Hz blips from Livingston with a "1," and label all the 200 Hz blips from Hanford with a "0," and see if the neural network can distinguish one "class" from another. If the Hanford 200 Hz blips are fundamentally different than the ones at Livingston (which would be assumed, based on the histogram plots in section \ref{plots}), the neural network should have a high accuracy and "classify" the blips easily.
+The goal of my supervised learning neural networks is to see whether specific attributes of blips create clusters. We can label specific blips based on their omicron trigger values, such as peak frequency or bandwidth, and then evaluate the correlation based on the accuracy of the trained neural network. For example, I can label all the 200 Hz blips from Livingston with a "1," and label all the 200 Hz blips from Hanford with a "0," and see if the neural network can distinguish which images are from which detector. A supervised network is trained on a subset of the labeled inputs, usually around 80-90 \%, leaving the rest for testing. If the Hanford 200 Hz blips are fundamentally different than the ones at Livingston (which would be assumed, based on the histogram plots in section \ref{plots}), the neural network should have a high accuracy and "classify" the blips easily.
 
-The example above is a case of binary classification, but we can create a neural network with as many classes as we want. Additionally, most neural networks have one input, but we can also create a two-input neural network that takes in both images and auxiliary data from the omicron trigger. As a result, I created four neural networks templates: one-input binary, two-input binary, one-input multi-class, and two-input multi-class. All four have almost exactly the same network of layers, but since they all have different uses, it is easy to implement different ideas. A condensed version of the layers in both of the two-input neural networks is in Figure \ref{fig:sup_condensed}. The only difference between the two-input CNN and the one-input CNN is that the \texttt{Flatten()} layer goes straight to the first \texttt{Dense()} layer with only one input. To make this network multi-class instead of binary, the output shape of the \texttt{main\_output} layer is changed from 1 to the number of classes, and the loss function is changed from \texttt{binary\_crossentropy} to \texttt{categorical\_crossentropy}.
+The example above is a case of binary classification, but we can create a neural network with as many classes as we want. Additionally, most neural networks have one input, but we can also create a two-input neural network that takes in both images and auxiliary data from the omicron trigger. As a result, I created four neural networks templates: one-input binary, two-input binary, one-input multi-class, and two-input multi-class. All four have almost exactly the same network of layers, but since they all have different uses, it is easy to implement different ideas. A condensed version of the layers in both of the two-input neural networks is in Figure \ref{fig:sup_condensed}. The only difference between the two-input CNN and the one-input CNN is that the \texttt{Flatten()} layer goes straight to the first \texttt{Dense()} layer with only one input. To make this network multi-class instead of binary, the output shape of the \texttt{main\_output} layer is changed from 1 to the number of classes, and the loss function is changed from \texttt{binary\_crossentropy} to \texttt{categorical\_crossentropy}. All layers other than the output layer in the supervised networks used the \texttt{relu} activation function, which was chosen in part because it is commonly used to to its advantages over \texttt{sigmoid} functions, and in part because it appeared to result in higher accuracy compared to other common functions\footnote{Other tried functions include \texttt{sigmoid}, \texttt{tanh}, \texttt{selu}, and \texttt{elu}. All functions either produced the same accuracies as \texttt{relu} or worse.}. For binary classification, the output activation function was \texttt{sigmoid}, and for multi-classification, the activation was \texttt{softmax}.
 
 \begin{figure}[h!]
 	\centering
@@ -328,7 +328,7 @@ The example above is a case of binary classification, but we can create a neural
 	\label{fig:sup_condensed}
 \end{figure}
 
-The auxiliary input consists of about 6-12 omicron data values, including but not limited to q-value, confidence, SNR, bandwidth, duration, interferometer, and image status. The shape of the auxiliary input varies depending on what "classes" the neural network is looking at. Going back to the earlier example about distinguishing Livingston 200 Hz blips from Hanford 200 Hz blips, that auxiliary input would not include the interferometer or the peak frequency of each blip. 
+The auxiliary input that went into the two-input neural networks consists of about 6-12 omicron data values, including but not limited to q-value, confidence, SNR, bandwidth, duration, interferometer, and image status. The shape of the auxiliary input, meaning the number of values in each input set, as well as the content, varies depending on what "classes" the neural network is looking at. Going back to the earlier example about distinguishing Livingston 200 Hz blips from Hanford 200 Hz blips, that auxiliary input would not include the interferometer or the peak frequency of each blip. 
 
 Although adding auxiliary input seems helpful because it gives the neural networks more information, the performance difference between one-input neural networks and two-input neural networks is practically non-existent. Using images by themselves is exactly the same as using images along with auxiliary data. This is consistent with GravitySpy, which is directly dependent on images. The auxiliary data is not robust enough to aid in classification, both in GravitySpy's glitch classification and this project's sub-classification of blips. As a result, I mostly use the one-input neural networks. A summary of the different supervised learning neural networks that I ran and their conclusions and implications is in the next section.
 
@@ -424,9 +424,9 @@ Although each network is comprised of the same set of layers, as explained in th
 
 The results from the supervised neural networks are, at best, mildly conclusive, with most attempts at isolating sub-classes falling completely short and little information gained from the start of running these neural networks to the end. As demonstrated by the failure of secondary auxiliary input to improve these networks, the different types of blips cannot be distinguished from each other by creating groupings based on the same auxiliary data. It is therefore not especially surprising that we must move to unsupervised learning to better find blip sub-classifications.
 
-\subsection{Unsupervised Neural Network}
+\subsection{Unsupervised Neural Network} \label{section:unsup}
 
-For my unsupervised neural network, I modified public source code\footnote{\href{https://github.com/keras-team/keras/blob/master/examples/variational_autoencoder.py}{GitHub source code}} to make a Variational Autoencoder (VAE). This type of unsupervised learning consists of an encoder and a decoder, where Bayesian statistic techniques are used between the encoder and decoder to find similarities between different inputs. These statistical values should have similar values when the inputs are similar, creating the possibility of clustering. Unlike supervised learning, which outputs a value corresponding to a class, autoencoders output new images. The neural network trains itself by trying to create as close to the same image as what was put in. Once the neural network is trained, the test images then get put through the encoder part of the neural network, which outputs the meaningful statistical values. We can then create a scatter plot of the statistical values from the test images and see if there are visible clusters \cite{Kingma:2013}. 
+For my unsupervised neural network, I modified public source code\footnote{\href{https://github.com/keras-team/keras/blob/master/examples/variational_autoencoder.py}{GitHub source code}} to make a Variational Autoencoder (VAE). This type of unsupervised learning consists of an encoder and a decoder, where Bayesian statistic techniques and k-means clustering are used between the encoder and decoder to find similarities between different inputs. These statistical values should map to similar values when the inputs are similar, creating the possibility of clustering. Unlike supervised learning, which outputs a value corresponding to a class, autoencoders output new images. The neural network trains itself by trying to create as close to the same image as what was put in. Once the neural network is trained, the test images then get put through the encoder part of the neural network, which outputs the meaningful statistical values. We can then create a scatter plot of the statistical values from the test images and see if there are visible clusters \cite{Kingma:2013}. 
 
 Since VAEs are so complex, it is difficult to implement convolutional layers within the autoencoder, especially when the input data is so large. However, I managed to sneak in a few layers into the encoder without overloading memory. The layers of the VAE neural network are in Figure \ref{fig:vae}.
 
@@ -456,7 +456,7 @@ Since VAEs are so complex, it is difficult to implement convolutional layers wit
 		\label{fig:decoder}
 	\end{subfigure}
 	
-	\caption{Layers of a Variational Autoencoder (VAE). The statistical values are at the end of the encoder in \ref{fig:encoder}, where the layers split into \texttt{z\_mean} and \texttt{z\_log\_var}. Additionally, the output \texttt{Dense()} layer in the decoder in \ref{fig:vae_decoder} has the same size as the \texttt{InputLayer()} in \ref{fig:encoder}, clearly demonstrating the difference between a VAE and a supervised network, which outputs a class number rather than a decoded image.}
+	\caption{Layers of a Variational Autoencoder (VAE). The statistical values are at the end of the encoder in \ref{fig:encoder}, where the layers split into \texttt{z\_mean} and \texttt{z\_log\_var}. At those stages, a function is called that takes in the inputs from the previous \texttt{Dense} layer and encodes the information into two numbers using k-means functions provided by Keras and Bayesian statistic equations. The output from the encoder, \texttt{z}, is what goes into the first layer of the decoder in \ref{fig:vae_decoder}. Additionally, the output \texttt{Dense()} layer in the decoder has the same size as the \texttt{InputLayer()} in \ref{fig:encoder}, clearly demonstrating the difference between a VAE and a supervised network, which outputs a class number rather than a decoded image.}
 	\label{fig:vae}
 \end{figure} 
 
@@ -464,7 +464,7 @@ The output of interest from the VAE is the statistical plot that can reveal clus
 
 \subsubsection{Results of Unsupervised Network}
 
-The first run of the VAE used no labels and included all the blips from both detectors during O2. Unsurprisingly, there are so many dots on the scatter plot that the graph is essentially a huge blob. However, labeling each blip with its interferometer distinguishes the blips slightly more, as seen in Figure \ref{fig:unlabeled}. Interestingly, there does appear to be a group offset from the rest in both plots.
+The first run of the VAE used no labels and included all the blips from both detectors during O2. Unsurprisingly, there are so many dots on the scatter plot that it is practically impossible to distinguish any patterns, let alone clear clusters. However, labeling each blip with its interferometer distinguishes the blips slightly more, as seen in Figure \ref{fig:unlabeled} on page \pageref{fig:unlabeled}. Looking closer at these initial plots, the scatter plot of the unlabeled blips in \ref{fig:vae_unlabeled} does have areas of higher concentration and lower concentration, despite the uniformity. There is also a small cluster to the bottom right, definitely separate from the majority. This small cluster is also present in \ref{fig:vae_ifo_unlabeled}. The rest of the blips, in the interferometer-labeled blips, provide evidence of clustering. There are more Livingston blips in the upper left of the plot and more Hanford blips in the middle right, and while there is a ton of overlap, this plot demonstrates the difference between the Hanford and Livingston blips as mentioned multiple times throughout this paper.
 
 \begin{figure}[h!]
 	\centering
@@ -480,52 +480,86 @@ The first run of the VAE used no labels and included all the blips from both det
 		\caption{Blips labeled by interferometer}
 		\label{fig:vae_ifo_unlabeled}
 	\end{subfigure}
-	\caption{Initial VAE scatter plots of all blips.}
+	\caption{Initial VAE scatter plots of all blips. The two axes are \texttt{z[0]} and \texttt{z[1]}, which are the output values from the Bayesian statistic and k-means function called in the last layer of the encoder. The values themselves don't mean anything except in relation to each other. The overall shape and location of the dots are also arbitrary and change every time the neural network is run, but similar images will always map to similar \texttt{z[0]} and \texttt{z[1]} values. This is why the left plot has a cluster right by the y-axis but the right plot has a cluster to the upper left.}
 	\label{fig:unlabeled}
 \end{figure}
 
-Blah blah blah something about the top plots blah blah blah something about the lower plots
+Since there are considerably fewer images in the side cluster in Figure \ref{fig:unlabeled}, it is easy to look at the actual images using saved data from when the VAE was trained and the scatter plot was created. The side cluster turned out to be images with indistinct signals, including spreads like those in section \ref{investigation} that were not resolved by the change in data. Interestingly, this discovery of spreads in my image database could explain some of the troubles with the supervised neural networks, especially considering that my investigation at the beginning of section \ref{O2} found that spreading can happen to any type of blip. Unfortunately, since the reason for the spreading effect is still unknown, it is currently impossible to know how many of these images are in the image database and eliminate them without manually going through each of the 13,802 blip images. It is also fruitless to recreate the image database and re-train the neural networks without having a solid solution for the spreading. Based on the visual density of dots in Figures \ref{fig:vae_unlabeled} and \ref{fig:vae_ifo_unlabeled}, however, it is safe to say that the majority of blips have a resolved signal. The elimination of the unresolved signals would most likely allow for a clearer picture of other clusters, but for now we can simply ignore the side cluster. 
+
+Fortunately, the clustering of unresolved signals is actually a good sign for the validity of the VAE. Spreads and other unresolved signals look very different from their resolved counterparts, and this difference is clearly defined in the scatter plot by the VAE. 
+
+At the beginning of the discussion about neural networks in section \ref{section:build_nn}, I mentioned the lack of sub-classified blips as a reason why supervised learning may be ineffective in this project. By this point in the summer, however, I had labeled just over 2,000 of the 13,802 O2 blips, or about 15\%, all of which were created from a randomly-shuffled array of GPS times. I took these labeled blips as the test images and trained my VAE on the other 85\% of the blips. The resulting scatter plot is in Figure \ref{fig:final_vae}. 
 
 \begin{figure}[h!]
 	\centering
-	\begin{subfigure}{.8\textwidth}
-		\centering
-		\includegraphics[width=1\linewidth]{vae_llo_freq_labeled}
-		\caption{Livingston blips labeled by their bin in Figure \ref{fig:llo_centr}.}
-		\label{fig:llo_freq_labeled}
-	\end{subfigure}
-	\begin{subfigure}{.8\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{vae_lho_freq_labeled}
-		\caption{Hanford blips labeled by their bin in Figure \ref{fig:lho_centr}.}
-		\label{fig:lho_freq_labeled}
-	\end{subfigure}
-	\caption{Blips labeled by frequency bins.}
-	\label{fig:freq_labeled}
+	\includegraphics[width=.8\linewidth]{vae_test_labeled4}
+	\caption{Sub-class labeled test blips.}
+	\label{fig:final_vae}
 \end{figure}
 
-Blah blah blah something about the frequency plots blah blah blah something about the subclass plots
+The scatter plot has clear, visible clusters! No colorbar can fully encapsulate seven different colors in a distinguishable way, so Figure \ref{fig:detailed_vae} on page \pageref{fig:detailed_vae} has some additional labels to help with seeing the different clusters and their corresponding sub-classes. There are a bunch of important take-aways from this scatter plot. First and foremost, this plot demonstrates that a neural network can be built to distinguish certain sub-classes of blips. There is overlap between the clusters, but the hat cluster in the mid-to-upper left is entirely independent of the stick cluster in the middle bottom of the plot, demonstrating definitive clustering. Second, we can easily distinguish the side cluster of unresolved signals, labeled here as unknowns. It is important that we didn't lose this cluster between runs of the neural network, otherwise we cannot trust these results. 
+
+Third, we can clearly see that there are three main types of blips: hats, normals, and sticks. The images used to create this plot are a random representation of all blips, and while manual sub-classification did give me the impression that there are more hats, normals, and sticks compared to the other types of blips, the scatter plot provides compelling evidence. Knowing which types of blips are more frequent, and that they can be distinguished from each other, is important for prioritizing sub-classification in future work. Based on this scatter plot, LIGO could eliminate almost all blips from both detectors by eliminating hats, normals, and sticks. 
+
+The more detailed plot in Figure \ref{fig:detailed_vae} brings another set of conclusions. The two most interesting things from the labels are the two completely separate clusters of dots and the lack of a snitch cluster. It is extremely unfortunate that the snitches did not cluster because their unique shape could make it easier to find its source compared to some of the other shapes. The lack of a cluster is probably because there are so few snitches overall. The fewer the images, the worse the neural network trains for that particular type of image. Additionally, the snitches could be clustered together and are simply obscured by the multitude of other blips. 
 
 \begin{figure}[h!]
 	\centering
-	\begin{subfigure}{.8\textwidth}
-		\centering
-		\includegraphics[width=1\linewidth]{vae_llo_labeled}
-		\caption{Livingston blips labeled by subclass.}
-		\label{fig:llo_labeled}
-	\end{subfigure}
-	\begin{subfigure}{.8\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{vae_lho_labeled}
-		\caption{Hanford blips labeled by subclass.}
-		\label{fig:lho_labeled}
-	\end{subfigure}
-	\caption{Blips labeled by subclass.}
-	\label{fig:vae_labeled}
+	\includegraphics[width=.8\linewidth]{vae_detailed}
+	\caption{Same scatter plot as Figure \ref{fig:final_vae}, with labels of clusters for more clarity. The snitches are the only sub-class that does not have its own separate cluster, and dots are the only sub-class that has multiple clusters.}
+	\label{fig:detailed_vae}
 \end{figure}
 
-Blah blah blah something about the suclasses slash the sticks and such blah blah blah something about conclusions and such blah blah blah
+The two clusters of dot blips are both curious and informative. I labeled dots based on their round, circular shape, but the two clusters suggest two different subclasses. I saved data about the GPS time, label, and coordinates for each blip on the scatter plot, and looking at the actual images from each cluster reveals the distinction, as shown in Figure \ref{fig:two_dots}. The left blip is from the upper left dot cluster and the right blip is from the bottom right cluster. While both blips have a round shape, the blips are at different frequencies and the right blip appears to have higher energy because of its clear background. Based on the clustering in Figure \ref{fig:final_vae}, these two should be different subclasses. I call the high-energy, high-frequency dot blips "suns," and stick to "dots" for the others.
 
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{dot_lowF}
+		\caption{Dot blip from upper left cluster in Figure \ref{fig:detailed_vae}.}
+		\label{fig:dot_lowf}
+	\end{subfigure}
+	\begin{subfigure}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{dot_highF}
+		\caption{Sun blip from upper left cluster in Figure \ref{fig:detailed_vae}.}
+		\label{fig:dot_highf}
+	\end{subfigure}
+	\caption{Dot-labeled blips from VAE results. The shapes of the two blips are very similar, but the sun blip is at a different frequency and has a higher energy.}
+	\label{fig:two_dots}
+\end{figure}
+
+The last important conclusion from Figures \ref{fig:final_vae} and \ref{fig:detailed_vae} is the overlap between the clusters. In particular, the normal cluster and the stick cluster are not only touching but intermixed. To investigate this result, I again used the data saved from the creation of the scatter plot to look at normals and sticks that clustered together. Figure \ref{fig:overlap} shows two blips within this overlap. 
+
+
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{normalish}
+		\caption{Normal blip from overlap in Figure \ref{fig:detailed_vae}.}
+		\label{fig:normalish}
+	\end{subfigure}
+	\begin{subfigure}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{stickish}
+		\caption{Stick blip from overlap in Figure \ref{fig:detailed_vae}.}
+		\label{fig:stickish}
+	\end{subfigure}
+	\caption{Two very similar-looking blips from the same region on the VAE scatter plot.}
+	\label{fig:overlap}
+\end{figure}
+
+The left blip was labeled as a normal and the right blip was labeled as a stick--the only visible difference between the two is that the "stick" trails upward past where the "normal" appears to end. Fortunately, these images explain why the VAE could not define clear clusters, but they leave the possibility of needing to add another subclass. Creating another subclass in between the normals and sticks is not as easy as adding sun blips, though, and doing so requires further attention and investigation.
+
+\section{Conclusions and Future Work}
+
+Three of the different shapes of blips that I found in my initial investigation, the hat, normal, and stick blips, were distinguishable from each other by the neural network. As described in the previous section, there is still work to be done to further define these sub-classes before moving forward with the larger goal of finding the sources of these blips, but the results of the unsupervised neural network established a real possibility of sub-classification of blip glitches. Additionally, the other possible subclasses each have their own potential and future work could improve their distinctions as well, as shown by the discovery of the sun blip within the dot blip sub-class. 
+
+The other area of future work is finding the cause of the spreading effect, which likely has something to do with the GWpy code and the whitening that occurs during a Q-transform calculation. If the spreading problem is eliminated, the other blips to look at are the double blips. I mentioned early on that the low-frequency signal inside the double blip might just be a whitening artifact, and an investigation into spreading might also result in a change to the spectrogram of the double-blips.
+
+Another aspect that I did not get to explore 
 
 \bibliography{references}
 \bibliographystyle{ieeetr}
